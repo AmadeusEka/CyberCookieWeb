@@ -1,7 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import type { Metadata } from 'next'
-import { SECTION_LABELS, SEVERITY_ORDER, severityBadgeClass } from '@/lib/utils'
-import type { SectionType, Severity } from '@/types/database'
+import { SEVERITY_ORDER, severityBadgeClass } from '@/lib/utils'
 
 export const metadata: Metadata = { title: 'Stats' }
 export const revalidate = 3600
@@ -10,11 +9,9 @@ async function getStats() {
   try {
     const [
       { data: sources },
-      { data: sections },
       { data: cves },
     ] = await Promise.all([
       supabase.from('sources').select('source_name'),
-      supabase.from('sections').select('section_type, created_at'),
       supabase.from('cves').select('severity'),
     ])
 
@@ -24,28 +21,22 @@ async function getStats() {
     }
     const topSources = Object.entries(sourceCounts).sort((a, b) => b[1] - a[1]).slice(0, 10)
 
-    const sectionCounts: Record<string, number> = {}
-    for (const s of (sections as any[]) ?? []) {
-      sectionCounts[s.section_type] = (sectionCounts[s.section_type] ?? 0) + 1
-    }
-
     const severityCounts: Record<string, number> = {}
     for (const c of (cves as any[]) ?? []) {
       severityCounts[c.severity] = (severityCounts[c.severity] ?? 0) + 1
     }
     const totalCves = Object.values(severityCounts).reduce((a, b) => a + b, 0)
 
-    return { topSources, sectionCounts, severityCounts, totalCves }
+    return { topSources, severityCounts, totalCves }
   } catch {
-    return { topSources: [], sectionCounts: {}, severityCounts: {}, totalCves: 0 }
+    return { topSources: [], severityCounts: {}, totalCves: 0 }
   }
 }
 
 export default async function StatsPage() {
-  const { topSources, sectionCounts, severityCounts, totalCves } = await getStats()
+  const { topSources, severityCounts, totalCves } = await getStats()
 
   const maxSourceCount = topSources[0]?.[1] ?? 1
-  const maxSectionCount = Math.max(...Object.values(sectionCounts), 1)
 
   return (
     <div className="space-y-12">
@@ -77,28 +68,6 @@ export default async function StatsPage() {
           })}
         </div>
       </section>
-
-      {/* Section Volume */}
-      {Object.keys(sectionCounts).length > 0 && (
-        <section className="space-y-4">
-          <h2 className="text-lg font-bold text-cream">Section Volume</h2>
-          <div className="space-y-3">
-            {Object.entries(sectionCounts).map(([type, count]) => {
-              const label = SECTION_LABELS[type as SectionType] ?? type
-              const pct = Math.round((count / maxSectionCount) * 100)
-              return (
-                <div key={type} className="flex items-center gap-4">
-                  <span className="text-xs text-ghost w-40 text-right truncate">{label}</span>
-                  <div className="flex-1 bg-ghost/10 rounded-full h-2">
-                    <div className="h-2 rounded-full bg-cookie-amber" style={{ width: `${pct}%` }} />
-                  </div>
-                  <span className="text-xs text-ghost w-8">{count}</span>
-                </div>
-              )
-            })}
-          </div>
-        </section>
-      )}
 
       {/* Top Sources */}
       {topSources.length > 0 && (

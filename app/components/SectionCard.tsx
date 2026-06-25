@@ -15,7 +15,16 @@ export default function SectionCard({ section, showIssueLink, issueNumber, issue
 
   return (
     <article className="border border-ghost/20 rounded-lg p-6 space-y-4">
-      <header className="flex items-start justify-between gap-4">
+      <header className="space-y-1">
+        {showIssueLink && issueNumber && (
+          <Link
+            href={`/issues/${issueNumber}`}
+            className="inline-block text-xs text-ghost hover:text-cookie-amber"
+          >
+            Issue #{issueNumber}
+            {issueDate && <span className="ml-1">· {formatDate(issueDate)}</span>}
+          </Link>
+        )}
         <div>
           <span className="text-xs font-mono text-cookie-amber uppercase tracking-widest">
             {label}
@@ -24,15 +33,6 @@ export default function SectionCard({ section, showIssueLink, issueNumber, issue
             <h2 className="text-xl font-bold text-cream mt-1">{section.title}</h2>
           )}
         </div>
-        {showIssueLink && issueNumber && (
-          <Link
-            href={`/issues/${issueNumber}`}
-            className="text-xs text-ghost hover:text-cookie-amber whitespace-nowrap"
-          >
-            Issue #{issueNumber}
-            {issueDate && <span className="ml-1">· {formatDate(issueDate)}</span>}
-          </Link>
-        )}
       </header>
 
       <Markdown>{section.body}</Markdown>
