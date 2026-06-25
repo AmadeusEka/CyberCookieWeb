@@ -35,13 +35,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header className="border-b border-ghost/20 sticky top-0 z-50 bg-void-black/95 backdrop-blur-sm">
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <Image src="/mascot.png" alt="Cyber Cookie mascot" width={60} height={60} className="rounded" priority />
+              <Image src="/mascot.png" alt="Cyber Cookie mascot" width={70} height={70} className="rounded" priority />
               <Image
                 src="/White Cyber Cookie Logo.png"
                 alt="Cyber Cookie"
-                width={250}
+                width={200}
                 height={120}
-                className="h-30 w-auto"
+                className="h-20 w-auto"
                 priority
               />
             </Link>
