@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist_Mono } from 'next/font/google'
 import Link from 'next/link'
+import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono' })
@@ -62,6 +63,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <p>Cyber Cookie — daily cybersecurity intelligence.</p>
           <p className="mt-1 text-ghost/50">All content is for informational purposes only.</p>
         </footer>
+
+        <Analytics />
       </body>
     </html>
   )
