@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Cyber Cookie brand palette — dark mode only
+   ============================================================ */
+@theme {
+  --color-void-black:    #0A0A0F;
+  --color-cookie-amber:  #C97C2E;
+  --color-breach-red:    #FF3C5A;
+  --color-terminal-green:#00FF88;
+  --color-cream:         #F5EAD0;
+  --color-ghost:         #5A5A72;
+
+  /* Semantic aliases */
+  --color-background:    var(--color-void-black);
+  --color-foreground:    var(--color-cream);
+  --color-muted:         var(--color-ghost);
+  --color-accent:        var(--color-cookie-amber);
+  --color-danger:        var(--color-breach-red);
+  --color-success:       var(--color-terminal-green);
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+html {
+  background-color: #0A0A0F;
+  color: #F5EAD0;
+  font-family: ui-monospace, 'Geist Mono', 'Fira Code', monospace;
+}
+
+body {
+  background-color: #0A0A0F;
+  color: #F5EAD0;
+  min-height: 100vh;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0A0A0F; }
+::-webkit-scrollbar-thumb { background: #5A5A72; border-radius: 3px; }
+
+/* Selection */
+::selection { background: #C97C2E33; color: #F5EAD0; }
+
+/* Links */
+a { color: #C97C2E; text-decoration: none; }
+a:hover { color: #F5EAD0; }
+
+/* Focus ring */
+:focus-visible { outline: 2px solid #C97C2E; outline-offset: 2px; }
+
+/* Code blocks */
+pre, code {
+  font-family: ui-monospace, 'Geist Mono', monospace;
+  font-size: 0.875rem;
+}
