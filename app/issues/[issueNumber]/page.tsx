@@ -22,12 +22,20 @@ async function getIssue(issueNumber: number) {
 
     if (!issue) return null
 
+    const [{ data: nextIssue }, { data: prevIssue }] = await Promise.all([
+      supabase.from('issues').select('issue_number').eq('issue_number', issueNumber + 1).maybeSingle(),
+      supabase.from('issues').select('issue_number').eq('issue_number', issueNumber - 1).maybeSingle(),
+    ])
+
     const { data: sections } = await supabase
       .from('sections')
       .select('*')
       .eq('issue_id', (issue as any).id)
 
-    if (!sections || sections.length === 0) return { issue: issue as any, sections: [] }
+    const hasNext = !!nextIssue
+    const hasPrev = !!prevIssue
+
+    if (!sections || sections.length === 0) return { issue: issue as any, sections: [], hasNext, hasPrev }
 
     const sectionIds = (sections as any[]).map((s) => s.id)
 
@@ -46,7 +54,7 @@ async function getIssue(issueNumber: number) {
         .flatMap((st) => st.tags ?? []),
     }))
 
-    return { issue: issue as any, sections: sortBySectionOrder(enriched) }
+    return { issue: issue as any, sections: sortBySectionOrder(enriched), hasNext, hasPrev }
   } catch {
     return null
   }
@@ -68,7 +76,7 @@ export default async function IssuePage({ params }: Props) {
   const data = await getIssue(num)
   if (!data) notFound()
 
-  const { issue, sections } = data
+  const { issue, sections, hasNext, hasPrev } = data
 
   return (
     <div className="space-y-8">
@@ -95,10 +103,12 @@ export default async function IssuePage({ params }: Props) {
       )}
 
       <div className="flex justify-between text-sm text-ghost pt-4 border-t border-ghost/20">
-        {num > 1 ? (
+        {hasPrev ? (
           <Link href={`/issues/${num - 1}`} className="hover:text-cookie-amber">← Issue #{num - 1}</Link>
         ) : <span />}
-        <Link href={`/issues/${num + 1}`} className="hover:text-cookie-amber">Issue #{num + 1} →</Link>
+        {hasNext ? (
+          <Link href={`/issues/${num + 1}`} className="hover:text-cookie-amber">Issue #{num + 1} →</Link>
+        ) : <span />}
       </div>
     </div>
   )

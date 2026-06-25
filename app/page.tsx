@@ -86,10 +86,10 @@ export default async function HomePage() {
 
       <div className="text-center pt-4">
         <Link
-          href={`/issues/${issue.issue_number - 1}`}
+          href="/issues"
           className="text-sm text-ghost hover:text-cookie-amber transition-colors"
         >
-          ← Previous issue
+          ← Browse all issues
         </Link>
       </div>
     </div>
