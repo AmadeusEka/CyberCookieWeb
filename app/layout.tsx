@@ -33,28 +33,55 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={geistMono.variable}>
       <body className="min-h-screen flex flex-col">
         <header className="border-b border-ghost/20 sticky top-0 z-50 bg-void-black/95 backdrop-blur-sm">
-          <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <Image src="/mascot.png" alt="Cyber Cookie mascot" width={70} height={70} className="rounded" priority />
+          <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
+              <Image
+                src="/mascot.png"
+                alt="Cyber Cookie mascot"
+                width={70}
+                height={70}
+                className="rounded h-9 w-9 md:h-[70px] md:w-[70px]"
+                priority
+              />
               <Image
                 src="/White Cyber Cookie Logo.png"
                 alt="Cyber Cookie"
                 width={200}
                 height={120}
-                className="h-20 w-auto"
+                className="h-8 md:h-20 w-auto"
                 priority
               />
             </Link>
-            <nav className="flex items-center gap-8 text-sm">
+
+            {/* Desktop nav */}
+            <nav className="hidden md:flex items-center gap-8 text-sm">
               {NAV_LINKS.map(({ href, label }) => (
                 <Link key={href} href={href} className="text-ghost hover:text-cream transition-colors">
                   {label}
                 </Link>
               ))}
             </nav>
+
+            {/* Mobile nav — native disclosure, no JS needed */}
+            <details className="md:hidden relative shrink-0">
+              <summary className="list-none cursor-pointer text-ghost hover:text-cream px-2 py-1 text-sm select-none">
+                Menu ▾
+              </summary>
+              <div className="absolute right-0 mt-2 w-44 bg-void-black border border-ghost/20 rounded-lg shadow-lg py-2 flex flex-col">
+                {NAV_LINKS.map(({ href, label }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className="px-4 py-2 text-sm text-ghost hover:text-cream hover:bg-ghost/10"
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            </details>
           </div>
           <div className="border-t border-ghost/10">
-            <div className="max-w-6xl mx-auto px-4 py-1.5 flex gap-10 text-xs overflow-x-auto">
+            <div className="max-w-6xl mx-auto px-4 py-1.5 flex gap-6 md:gap-10 text-xs overflow-x-auto">
               {SECTION_LINKS.map(({ href, label }) => (
                 <Link key={href} href={href} className="text-ghost/70 hover:text-cookie-amber transition-colors whitespace-nowrap">
                   {label}
