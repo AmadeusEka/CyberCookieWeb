@@ -34,13 +34,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen flex flex-col">
         <header className="border-b border-ghost/20 sticky top-0 z-50 bg-void-black/95 backdrop-blur-sm">
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
+            <Link
+              href="/"
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0"
+            >
               <Image
                 src="/mascot.png"
                 alt="Cyber Cookie mascot"
                 width={70}
                 height={70}
-                className="rounded h-9 w-9 md:h-[70px] md:w-[70px]"
+                className="rounded h-9 w-9 md:h-17.5 md:w-17.5"
                 priority
               />
               <Image
@@ -56,7 +59,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {/* Desktop nav */}
             <nav className="hidden md:flex items-center gap-8 text-sm">
               {NAV_LINKS.map(({ href, label }) => (
-                <Link key={href} href={href} className="text-ghost hover:text-cream transition-colors">
+                <Link
+                  key={href}
+                  href={href}
+                  className="text-ghost hover:text-cream transition-colors"
+                >
                   {label}
                 </Link>
               ))}
@@ -83,7 +90,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="border-t border-ghost/10">
             <div className="max-w-6xl mx-auto px-4 py-1.5 flex gap-6 md:gap-10 text-xs overflow-x-auto">
               {SECTION_LINKS.map(({ href, label }) => (
-                <Link key={href} href={href} className="text-ghost/70 hover:text-cookie-amber transition-colors whitespace-nowrap">
+                <Link
+                  key={href}
+                  href={href}
+                  className="text-ghost/70 hover:text-cookie-amber transition-colors whitespace-nowrap"
+                >
                   {label}
                 </Link>
               ))}
@@ -97,11 +108,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <footer className="border-t border-ghost/20 py-6 text-center text-xs text-ghost">
           <p>Cyber Cookie — daily cybersecurity intelligence.</p>
-          <p className="mt-1 text-ghost/50">All content is for informational purposes only.</p>
+          <p className="mt-1 text-ghost/50">
+            All content is for informational purposes only.
+          </p>
         </footer>
 
         <Analytics />
       </body>
     </html>
-  )
+  );
 }
