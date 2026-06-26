@@ -79,10 +79,15 @@ export default async function HomePage() {
       </div>
 
       {issue.sign_off && (
-        <p className="text-right text-sm text-ghost italic border-t border-ghost/20 pt-4">
+        <p className="text-center text-sm text-ghost italic border-t border-ghost/20 pt-4">
           {issue.sign_off}
         </p>
       )}
+
+      <p className="text-center text-sm text-ghost/80">
+        Cyber Cookie is AI-assisted. Always verify critical information with
+        official sources before acting.
+      </p>
 
       <div className="text-center pt-4">
         <Link
@@ -93,5 +98,5 @@ export default async function HomePage() {
         </Link>
       </div>
     </div>
-  )
+  );
 }

@@ -15,11 +15,25 @@ async function getStats() {
       supabase.from('cves').select('severity'),
     ])
 
-    const sourceCounts: Record<string, number> = {}
+    // Group by a normalized key (case/whitespace-insensitive) so minor
+    // spelling drift in the source drafts ("SecurityWeek" vs "Security Week")
+    // doesn't fragment the same outlet into separate entries. Display the
+    // most common original spelling for each group.
+    const normalize = (name: string) => name.toLowerCase().replace(/\s+/g, '')
+    const groups: Record<string, { total: number; spellings: Record<string, number> }> = {}
     for (const s of (sources as any[]) ?? []) {
-      sourceCounts[s.source_name] = (sourceCounts[s.source_name] ?? 0) + 1
+      const key = normalize(s.source_name)
+      groups[key] ??= { total: 0, spellings: {} }
+      groups[key].total += 1
+      groups[key].spellings[s.source_name] = (groups[key].spellings[s.source_name] ?? 0) + 1
     }
-    const topSources = Object.entries(sourceCounts).sort((a, b) => b[1] - a[1]).slice(0, 10)
+    const topSources: [string, number][] = Object.values(groups)
+      .map((g) => {
+        const displayName = Object.entries(g.spellings).sort((a, b) => b[1] - a[1])[0][0]
+        return [displayName, g.total] as [string, number]
+      })
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
 
     const severityCounts: Record<string, number> = {}
     for (const c of (cves as any[]) ?? []) {
