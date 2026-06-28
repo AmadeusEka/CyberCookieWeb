@@ -85,17 +85,6 @@ export default function SectionCard({ section, showIssueLink, issueNumber, issue
           </ul>
         </div>
       )}
-
-      {/* Tags */}
-      {section.tags.length > 0 && (
-        <div className="flex flex-wrap gap-2 pt-1">
-          {section.tags.map((tag) => (
-            <span key={tag.id} className="text-xs font-mono bg-ghost/10 text-ghost px-2 py-0.5 rounded">
-              #{tag.name}
-            </span>
-          ))}
-        </div>
-      )}
     </article>
   )
 }

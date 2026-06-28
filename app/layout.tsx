@@ -9,7 +9,7 @@ const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono' })
 
 export const metadata: Metadata = {
   title: { default: 'Cyber Cookie', template: '%s — Cyber Cookie' },
-  description: 'Daily cybersecurity intelligence: breaches, CVEs, defensive tactics, and emerging threats.',
+  description: 'Bite-sized cybersecurity news. Freshly baked.',
 }
 
 const NAV_LINKS = [
@@ -107,7 +107,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </main>
 
         <footer className="border-t border-ghost/20 py-6 text-center text-xs text-ghost">
-          <p>Cyber Cookie — daily cybersecurity intelligence.</p>
+          <p>Cyber Cookie — Bite-sized cybersecurity news. Freshly baked.</p>
           <p className="mt-1 text-ghost/50">
             All content is for informational purposes only.
           </p>

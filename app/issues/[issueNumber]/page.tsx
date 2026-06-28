@@ -39,19 +39,15 @@ async function getIssue(issueNumber: number) {
 
     const sectionIds = (sections as any[]).map((s) => s.id)
 
-    const [{ data: cves }, { data: sources }, { data: sectionTags }] = await Promise.all([
+    const [{ data: cves }, { data: sources }] = await Promise.all([
       supabase.from('cves').select('*').in('section_id', sectionIds),
       supabase.from('sources').select('*').in('section_id', sectionIds),
-      supabase.from('section_tags').select('section_id, tags(id, name)').in('section_id', sectionIds),
     ])
 
     const enriched: SectionWithDetails[] = (sections as any[]).map((s) => ({
       ...s,
       cves: (cves as any[])?.filter((c) => c.section_id === s.id) ?? [],
       sources: (sources as any[])?.filter((src) => src.section_id === s.id) ?? [],
-      tags: ((sectionTags as any[]) ?? [])
-        .filter((st) => st.section_id === s.id)
-        .flatMap((st) => st.tags ?? []),
     }))
 
     return { issue: issue as any, sections: sortBySectionOrder(enriched), hasNext, hasPrev }

@@ -38,10 +38,9 @@ async function getSections(slug: string, page: number) {
 
     const sectionIds = (sections as any[]).map((s) => s.id)
 
-    const [{ data: cves }, { data: sources }, { data: sectionTags }] = await Promise.all([
+    const [{ data: cves }, { data: sources }] = await Promise.all([
       supabase.from('cves').select('*').in('section_id', sectionIds),
       supabase.from('sources').select('*').in('section_id', sectionIds),
-      supabase.from('section_tags').select('section_id, tags(id, name)').in('section_id', sectionIds),
     ])
 
     const enriched = (sections as any[]).map((s) => {
@@ -52,9 +51,6 @@ async function getSections(slug: string, page: number) {
         issue_date: issues?.issue_date,
         cves: (cves as any[])?.filter((c) => c.section_id === s.id) ?? [],
         sources: (sources as any[])?.filter((src) => src.section_id === s.id) ?? [],
-        tags: ((sectionTags as any[]) ?? [])
-          .filter((st) => st.section_id === s.id)
-          .flatMap((st) => st.tags ?? []),
       } as SectionWithDetails & { issue_number?: number; issue_date?: string }
     })
 

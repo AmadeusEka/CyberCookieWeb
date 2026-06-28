@@ -50,11 +50,6 @@ export interface Source {
   created_at: string
 }
 
-export interface Tag {
-  id: number
-  name: string
-}
-
 // Enriched types used in page queries
 export interface IssueWithSections extends Issue {
   sections: SectionWithDetails[]
@@ -63,7 +58,6 @@ export interface IssueWithSections extends Issue {
 export interface SectionWithDetails extends Section {
   cves: Cve[]
   sources: Source[]
-  tags: Tag[]
 }
 
 export type Database = {
@@ -73,8 +67,6 @@ export type Database = {
       sections: { Row: Section }
       cves: { Row: Cve }
       sources: { Row: Source }
-      tags: { Row: Tag }
-      section_tags: { Row: { section_id: number; tag_id: number } }
     }
   }
 }
