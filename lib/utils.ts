@@ -4,9 +4,9 @@ import type { SectionType, Severity } from '@/types/database'
 // sequence. Do not rely on alphabetical or insertion order anywhere.
 export const SECTION_ORDER: SectionType[] = [
   'breach_of_the_day',
+  'ai_emerging_threats',
   'vulnerability_watch',
   'defenders_corner',
-  'ai_emerging_threats',
   'compliance_pulse',
 ]
 
@@ -17,30 +17,30 @@ export function sortBySectionOrder<T extends { section_type: SectionType }>(sect
 }
 
 export const SECTION_LABELS: Record<SectionType, string> = {
-  breach_of_the_day: 'Breach of the Day',
-  vulnerability_watch: 'Vulnerability Watch',
+  breach_of_the_day: "Breach of the Day",
+  ai_emerging_threats: "AI & Emerging Threats",
+  vulnerability_watch: "Vulnerability Watch",
   defenders_corner: "Defender's Corner",
-  ai_emerging_threats: 'AI & Emerging Threats',
-  compliance_pulse: 'Compliance Pulse',
-}
+  compliance_pulse: "Compliance Pulse",
+};
 
 // URL slug → section_type
 export const SLUG_TO_SECTION: Record<string, SectionType> = {
-  'breach-of-the-day': 'breach_of_the_day',
-  'vulnerability-watch': 'vulnerability_watch',
-  'defenders-corner': 'defenders_corner',
-  'ai-emerging-threats': 'ai_emerging_threats',
-  'compliance-pulse': 'compliance_pulse',
-}
+  "breach-of-the-day": "breach_of_the_day",
+  "ai-emerging-threats": "ai_emerging_threats",
+  "vulnerability-watch": "vulnerability_watch",
+  "defenders-corner": "defenders_corner",
+  "compliance-pulse": "compliance_pulse",
+};
 
 // section_type → URL slug
 export const SECTION_TO_SLUG: Record<SectionType, string> = {
-  breach_of_the_day: 'breach-of-the-day',
-  vulnerability_watch: 'vulnerability-watch',
-  defenders_corner: 'defenders-corner',
-  ai_emerging_threats: 'ai-emerging-threats',
-  compliance_pulse: 'compliance-pulse',
-}
+  breach_of_the_day: "breach-of-the-day",
+  ai_emerging_threats: "ai-emerging-threats",
+  vulnerability_watch: "vulnerability-watch",
+  defenders_corner: "defenders-corner",
+  compliance_pulse: "compliance-pulse",
+};
 
 export const SEVERITY_ORDER: Severity[] = ['critical', 'high', 'medium', 'low', 'unrated']
 
