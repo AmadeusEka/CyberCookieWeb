@@ -64,6 +64,14 @@ export function severityBadgeClass(severity: Severity) {
   return SEVERITY_COLORS[severity]
 }
 
+// Strips characters that have special meaning in PostgREST's filter grammar
+// (used by .or()/.ilike() etc). Without this, a search term containing
+// `,` `(` `)` `*` could break out of the intended title/body match and
+// alter which rows the filter matches. Plain text searches are unaffected.
+export function sanitizeSearchTerm(text: string) {
+  return text.replace(/[,()%*]/g, '').trim()
+}
+
 // Strips markdown syntax for plain-text previews (e.g. line-clamped excerpts)
 // where rendering real markdown elements would break truncation.
 export function stripMarkdown(text: string) {

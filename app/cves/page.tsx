@@ -34,7 +34,6 @@ export default async function CvesPage({ searchParams }: Props) {
     let query = supabase
       .from('cves')
       .select('*, sections(issue_id, issues(issue_number))')
-      .order('cvss_score', { ascending: false, nullsFirst: false })
 
     if (activeSeverity) {
       query = (query as any).eq('severity', activeSeverity)
@@ -42,6 +41,14 @@ export default async function CvesPage({ searchParams }: Props) {
 
     const { data } = await query
     cves = (data as any[]) ?? []
+
+    // Latest issue first, then by severity (critical → unrated) within each issue
+    cves.sort((a, b) => {
+      const issueA = a.sections?.issues?.issue_number ?? 0
+      const issueB = b.sections?.issues?.issue_number ?? 0
+      if (issueB !== issueA) return issueB - issueA
+      return SEVERITY_ORDER.indexOf(a.severity) - SEVERITY_ORDER.indexOf(b.severity)
+    })
   } catch {
     cves = []
   }

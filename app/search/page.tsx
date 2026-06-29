@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { SECTION_LABELS, severityBadgeClass, formatDate, stripMarkdown } from '@/lib/utils'
+import { SECTION_LABELS, severityBadgeClass, formatDate, stripMarkdown, sanitizeSearchTerm } from '@/lib/utils'
 import type { SectionType } from '@/types/database'
 import { headers } from 'next/headers'
 import { checkRateLimit } from '@/lib/ratelimit'
@@ -32,20 +32,26 @@ export default async function SearchPage({ searchParams }: Props) {
     }
   }
 
+  // Strip PostgREST filter syntax characters before building any .or() filter
+  // — otherwise a search term containing `,` `(` `)` `*` `%` could break out
+  // of the intended title/body match. The raw `query` is still used for
+  // display ("results for ...") so the user sees what they actually typed.
+  const safeTerm = sanitizeSearchTerm(query)
+
   let sections: any[] = []
   let cves: any[] = []
 
-  if (query.length >= 2) {
+  if (safeTerm.length >= 2) {
     const [{ data: sectionResults }, { data: cveResults }] = await Promise.all([
       supabase
         .from('sections')
         .select('id, section_type, title, body, issues(issue_number, issue_date)')
-        .or(`title.ilike.%${query}%,body.ilike.%${query}%`)
+        .or(`title.ilike.%${safeTerm}%,body.ilike.%${safeTerm}%`)
         .limit(20),
       supabase
         .from('cves')
         .select('id, cve_id, product_name, severity, cvss_score, sections(issue_id, issues(issue_number))')
-        .or(`cve_id.ilike.%${query}%,product_name.ilike.%${query}%,product_blurb.ilike.%${query}%`)
+        .or(`cve_id.ilike.%${safeTerm}%,product_name.ilike.%${safeTerm}%,product_blurb.ilike.%${safeTerm}%`)
         .limit(10),
     ])
     sections = sectionResults ?? []
