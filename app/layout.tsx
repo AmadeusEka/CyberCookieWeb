@@ -8,25 +8,27 @@ import './globals.css'
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono' })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://cybercookie.vercel.app'),
   title: { default: 'Cyber Cookie', template: '%s — Cyber Cookie' },
   description: 'Bite-sized cybersecurity news. Freshly baked.',
 }
 
 const NAV_LINKS = [
-  { href: '/',                label: 'Latest' },
-  { href: '/issues',          label: 'Issues' },
-  { href: '/cves',           label: 'CVEs' },
-  { href: '/stats',          label: 'Stats' },
-  { href: '/search',         label: 'Search' },
-]
+  { href: "/about", label: "About" },
+  { href: "/", label: "Latest" },
+  { href: "/issues", label: "Issues" },
+  { href: "/cves", label: "CVEs" },
+  { href: "/stats", label: "Stats" },
+  { href: "/search", label: "Search" },
+];
 
 const SECTION_LINKS = [
-  { href: '/sections/breach-of-the-day',    label: 'Breach of the Day' },
-  { href: '/sections/vulnerability-watch',  label: 'Vulnerability Watch' },
-  { href: '/sections/defenders-corner',     label: "Defender's Corner" },
-  { href: '/sections/ai-emerging-threats',  label: 'AI and Emerging Threats' },
-  { href: '/sections/compliance-pulse',     label: 'Compliance Pulse' },
-]
+  { href: "/sections/breach-of-the-day", label: "Breach of the Day" },
+  { href: "/sections/ai-emerging-threats", label: "AI and Emerging Threats" },
+  { href: "/sections/vulnerability-watch", label: "Vulnerability Watch" },
+  { href: "/sections/defenders-corner", label: "Defender's Corner" },
+  { href: "/sections/compliance-pulse", label: "Compliance Pulse" },
+];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
