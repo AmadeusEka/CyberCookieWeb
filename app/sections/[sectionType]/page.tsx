@@ -22,21 +22,25 @@ async function getSections(slug: string, page: number) {
   try {
     const limit = page * PAGE_SIZE
 
-    const [{ data: sections }, { count }] = await Promise.all([
-      supabase
-        .from('sections')
-        .select('*, issues(issue_number, issue_date)')
-        .eq('section_type', sectionType)
-        .order('created_at', { ascending: false })
-        .range(0, limit - 1),
-      supabase.from('sections').select('*', { count: 'exact', head: true }).eq('section_type', sectionType),
-    ])
+    // Supabase's .order(referencedTable:) sorts the embedded array *within*
+    // each row, not the parent rows themselves — a no-op for this to-one
+    // relationship. So fetch everything for this section type and sort by
+    // issue_number in JS instead, same approach as /cves.
+    const { data: allSections } = await supabase
+      .from('sections')
+      .select('*, issues(issue_number, issue_date)')
+      .eq('section_type', sectionType)
 
-    const total = count ?? 0
+    const total = allSections?.length ?? 0
 
-    if (!sections) return { sectionType, label: SECTION_LABELS[sectionType], sections: [], total }
+    if (!allSections) return { sectionType, label: SECTION_LABELS[sectionType], sections: [], total }
 
-    const sectionIds = (sections as any[]).map((s) => s.id)
+    const sorted = [...(allSections as any[])].sort(
+      (a, b) => (b.issues?.issue_number ?? 0) - (a.issues?.issue_number ?? 0)
+    )
+    const sections = sorted.slice(0, limit)
+
+    const sectionIds = sections.map((s) => s.id)
 
     const [{ data: cves }, { data: sources }] = await Promise.all([
       supabase.from('cves').select('*').in('section_id', sectionIds),
