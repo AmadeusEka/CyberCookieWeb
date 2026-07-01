@@ -4,6 +4,16 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { severityBadgeClass } from '@/lib/utils'
 import Markdown from '@/app/components/Markdown'
+import type { Cve, SectionType } from '@/types/database'
+
+interface CveOccurrence extends Cve {
+  sections: {
+    issue_id: number
+    section_type: SectionType
+    title: string | null
+    issues: { issue_number: number; issue_date: string; title: string } | null
+  } | null
+}
 
 export const revalidate = 3600
 
@@ -19,7 +29,7 @@ async function getCveOccurrences(cveId: string) {
       .eq('cve_id', cveId)
       .order('id', { ascending: true })
 
-    return (data as any[]) ?? []
+    return (data as CveOccurrence[]) ?? []
   } catch {
     return []
   }
@@ -57,7 +67,7 @@ export default async function CveDetailPage({ params }: Props) {
 
       <div className="space-y-8">
         {occurrences.map((cve) => {
-          const section = cve.sections as any
+          const section = cve.sections
           const issue = section?.issues
 
           return (

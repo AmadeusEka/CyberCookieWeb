@@ -21,7 +21,7 @@ async function getStats() {
     // most common original spelling for each group.
     const normalize = (name: string) => name.toLowerCase().replace(/\s+/g, '')
     const groups: Record<string, { total: number; spellings: Record<string, number> }> = {}
-    for (const s of (sources as any[]) ?? []) {
+    for (const s of sources ?? []) {
       const key = normalize(s.source_name)
       groups[key] ??= { total: 0, spellings: {} }
       groups[key].total += 1
@@ -36,7 +36,7 @@ async function getStats() {
       .slice(0, 10)
 
     const severityCounts: Record<string, number> = {}
-    for (const c of (cves as any[]) ?? []) {
+    for (const c of cves ?? []) {
       severityCounts[c.severity] = (severityCounts[c.severity] ?? 0) + 1
     }
     const totalCves = Object.values(severityCounts).reduce((a, b) => a + b, 0)

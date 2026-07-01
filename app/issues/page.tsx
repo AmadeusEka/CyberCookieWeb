@@ -25,7 +25,7 @@ async function getIssues(page: number) {
       supabase.from('issues').select('*', { count: 'exact', head: true }),
     ])
 
-    return { issues: (issues as any[]) ?? [], total: count ?? 0 }
+    return { issues: issues ?? [], total: count ?? 0 }
   } catch {
     return { issues: [], total: 0 }
   }

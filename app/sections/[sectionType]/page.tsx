@@ -4,7 +4,20 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import SectionCard from '@/app/components/SectionCard'
 import { SLUG_TO_SECTION, SECTION_LABELS } from '@/lib/utils'
-import type { SectionWithDetails } from '@/types/database'
+import type { SectionType, SectionWithDetails, Cve, Source } from '@/types/database'
+
+interface SectionRow {
+  id: number
+  issue_id: number
+  section_type: SectionType
+  title: string | null
+  body: string
+  word_count: number | null
+  created_at: string
+  issues: { issue_number: number; issue_date: string } | null
+}
+
+type EnrichedSection = SectionWithDetails & { issue_number?: number; issue_date?: string }
 
 export const revalidate = 3600
 
@@ -35,7 +48,7 @@ async function getSections(slug: string, page: number) {
 
     if (!allSections) return { sectionType, label: SECTION_LABELS[sectionType], sections: [], total }
 
-    const sorted = [...(allSections as any[])].sort(
+    const sorted = [...(allSections as SectionRow[])].sort(
       (a, b) => (b.issues?.issue_number ?? 0) - (a.issues?.issue_number ?? 0)
     )
     const sections = sorted.slice(0, limit)
@@ -47,18 +60,18 @@ async function getSections(slug: string, page: number) {
       supabase.from('sources').select('*').in('section_id', sectionIds),
     ])
 
-    const enriched = (sections as any[]).map((s) => {
+    const enriched = (sections as SectionRow[]).map((s) => {
       const { issues, ...rest } = s
       return {
         ...rest,
         issue_number: issues?.issue_number,
         issue_date: issues?.issue_date,
-        cves: (cves as any[])?.filter((c) => c.section_id === s.id) ?? [],
-        sources: (sources as any[])?.filter((src) => src.section_id === s.id) ?? [],
-      } as SectionWithDetails & { issue_number?: number; issue_date?: string }
+        cves: (cves as Cve[])?.filter((c) => c.section_id === s.id) ?? [],
+        sources: (sources as Source[])?.filter((src) => src.section_id === s.id) ?? [],
+      } as EnrichedSection
     })
 
-    return { sectionType, label: SECTION_LABELS[sectionType], sections: enriched, total }
+    return { sectionType, label: SECTION_LABELS[sectionType], sections: enriched as EnrichedSection[], total }
   } catch {
     return { sectionType, label: SECTION_LABELS[sectionType], sections: [], total: 0 }
   }
@@ -80,7 +93,7 @@ export default async function SectionTypePage({ params, searchParams }: Props) {
 
   if (!data) notFound()
 
-  const { label, sections, total } = data
+  const { label, sections, total } = data as { label: string; sections: EnrichedSection[]; total: number; sectionType: string }
   const hasMore = sections.length < total
 
   return (
@@ -100,8 +113,8 @@ export default async function SectionTypePage({ params, searchParams }: Props) {
               key={section.id}
               section={section}
               showIssueLink
-              issueNumber={(section as any).issue_number}
-              issueDate={(section as any).issue_date}
+              issueNumber={section.issue_number}
+              issueDate={section.issue_date}
             />
           ))
         )}

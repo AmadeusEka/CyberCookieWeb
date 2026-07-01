@@ -2,9 +2,26 @@ import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { SECTION_LABELS, severityBadgeClass, formatDate, stripMarkdown, sanitizeSearchTerm } from '@/lib/utils'
-import type { SectionType } from '@/types/database'
+import type { SectionType, Severity } from '@/types/database'
 import { headers } from 'next/headers'
 import { checkRateLimit } from '@/lib/ratelimit'
+
+interface CveSearchResult {
+  id: number
+  cve_id: string | null
+  product_name: string
+  severity: Severity
+  cvss_score: number | null
+  sections: { issue_id: number; issues: { issue_number: number } | null } | null
+}
+
+interface SectionSearchResult {
+  id: number
+  section_type: SectionType
+  title: string | null
+  body: string
+  issues: { issue_number: number; issue_date: string } | null
+}
 
 export const metadata: Metadata = { title: 'Search' }
 export const dynamic = 'force-dynamic'
@@ -38,8 +55,8 @@ export default async function SearchPage({ searchParams }: Props) {
   // display ("results for ...") so the user sees what they actually typed.
   const safeTerm = sanitizeSearchTerm(query)
 
-  let sections: any[] = []
-  let cves: any[] = []
+  let sections: SectionSearchResult[] = []
+  let cves: CveSearchResult[] = []
 
   if (safeTerm.length >= 2) {
     const [{ data: sectionResults }, { data: cveResults }] = await Promise.all([
@@ -54,8 +71,8 @@ export default async function SearchPage({ searchParams }: Props) {
         .or(`cve_id.ilike.%${safeTerm}%,product_name.ilike.%${safeTerm}%,product_blurb.ilike.%${safeTerm}%`)
         .limit(10),
     ])
-    sections = sectionResults ?? []
-    cves = cveResults ?? []
+    sections = (sectionResults as unknown as SectionSearchResult[]) ?? []
+    cves = (cveResults as unknown as CveSearchResult[]) ?? []
   }
 
   const total = sections.length + cves.length
@@ -97,7 +114,7 @@ export default async function SearchPage({ searchParams }: Props) {
             <section className="space-y-3">
               <h2 className="text-sm font-mono text-ghost uppercase tracking-widest">CVEs</h2>
               {cves.map((cve) => {
-                const issueNum = (cve.sections as any)?.issues?.issue_number
+                const issueNum = cve.sections?.issues?.issue_number
                 const href = cve.cve_id ? `/cves/${encodeURIComponent(cve.cve_id)}` : issueNum ? `/issues/${issueNum}` : '/issues'
                 return (
                   <Link
@@ -130,7 +147,7 @@ export default async function SearchPage({ searchParams }: Props) {
             <section className="space-y-3">
               <h2 className="text-sm font-mono text-ghost uppercase tracking-widest">Sections</h2>
               {sections.map((section) => {
-                const issue = (section.issues as any)
+                const issue = section.issues
                 const href = issue?.issue_number ? `/issues/${issue.issue_number}` : '/issues'
                 return (
                   <Link

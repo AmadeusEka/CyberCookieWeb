@@ -4,7 +4,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import SectionCard from '@/app/components/SectionCard'
 import { formatDate, sortBySectionOrder } from '@/lib/utils'
-import type { SectionWithDetails } from '@/types/database'
+import type { Issue, Section, Cve, Source, SectionWithDetails } from '@/types/database'
 
 export const revalidate = 3600
 
@@ -30,27 +30,27 @@ async function getIssue(issueNumber: number) {
     const { data: sections } = await supabase
       .from('sections')
       .select('*')
-      .eq('issue_id', (issue as any).id)
+      .eq('issue_id', issue.id)
 
     const hasNext = !!nextIssue
     const hasPrev = !!prevIssue
 
-    if (!sections || sections.length === 0) return { issue: issue as any, sections: [], hasNext, hasPrev }
+    if (!sections || sections.length === 0) return { issue: issue as Issue, sections: [], hasNext, hasPrev }
 
-    const sectionIds = (sections as any[]).map((s) => s.id)
+    const sectionIds = (sections as Section[]).map((s) => s.id)
 
     const [{ data: cves }, { data: sources }] = await Promise.all([
       supabase.from('cves').select('*').in('section_id', sectionIds),
       supabase.from('sources').select('*').in('section_id', sectionIds),
     ])
 
-    const enriched: SectionWithDetails[] = (sections as any[]).map((s) => ({
+    const enriched: SectionWithDetails[] = (sections as Section[]).map((s) => ({
       ...s,
-      cves: (cves as any[])?.filter((c) => c.section_id === s.id) ?? [],
-      sources: (sources as any[])?.filter((src) => src.section_id === s.id) ?? [],
+      cves: (cves as Cve[])?.filter((c) => c.section_id === s.id) ?? [],
+      sources: (sources as Source[])?.filter((src) => src.section_id === s.id) ?? [],
     }))
 
-    return { issue: issue as any, sections: sortBySectionOrder(enriched), hasNext, hasPrev }
+    return { issue: issue as Issue, sections: sortBySectionOrder(enriched), hasNext, hasPrev }
   } catch {
     return null
   }

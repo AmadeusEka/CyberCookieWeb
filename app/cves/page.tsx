@@ -2,7 +2,11 @@ import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { severityBadgeClass, SEVERITY_ORDER, stripMarkdown } from '@/lib/utils'
-import type { Severity } from '@/types/database'
+import type { Severity, Cve } from '@/types/database'
+
+interface CveWithSection extends Cve {
+  sections: { issue_id: number; issues: { issue_number: number } | null } | null
+}
 import { headers } from 'next/headers'
 import { checkRateLimit } from '@/lib/ratelimit'
 
@@ -29,18 +33,16 @@ export default async function CvesPage({ searchParams }: Props) {
   const { severity } = await searchParams
   const activeSeverity = SEVERITY_ORDER.includes(severity as Severity) ? (severity as Severity) : null
 
-  let cves: any[] = []
+  let cves: CveWithSection[] = []
   try {
-    let query = supabase
+    const baseQuery = supabase
       .from('cves')
       .select('*, sections(issue_id, issues(issue_number))')
 
-    if (activeSeverity) {
-      query = (query as any).eq('severity', activeSeverity)
-    }
-
-    const { data } = await query
-    cves = (data as any[]) ?? []
+    const { data } = activeSeverity
+      ? await baseQuery.eq('severity', activeSeverity)
+      : await baseQuery
+    cves = (data as CveWithSection[]) ?? []
 
     // Latest issue first, then by severity (critical → unrated) within each issue
     cves.sort((a, b) => {
@@ -84,7 +86,7 @@ export default async function CvesPage({ searchParams }: Props) {
       ) : (
         <div className="space-y-3">
           {cves.map((cve) => {
-            const issueNum = (cve.sections as any)?.issues?.issue_number
+            const issueNum = cve.sections?.issues?.issue_number
             return (
               <div key={cve.id} className="border border-ghost/20 rounded-lg p-4 flex flex-col sm:flex-row sm:items-start gap-4">
                 <div className="flex-1 space-y-1">
